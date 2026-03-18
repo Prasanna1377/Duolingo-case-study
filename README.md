@@ -1,6 +1,6 @@
 # Duolingo Case Study: Beyond the Streak
 
-An independent product analytics case study examining why Duolingo's streak mechanic is plateauing and proposing a motivation-based personalization solution grounded in behavioral theory.
+An independent product analytics case study examining why Duolingo's streak mechanic is plateauing and proposing a motivation based personalization solution grounded in behavioral theory.
 
 ## View the case study
 
