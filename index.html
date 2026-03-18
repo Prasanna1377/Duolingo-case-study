@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Duolingo Case Study: Beyond the Streak | Prasanna Pingale</title>
+<meta name="description" content="An independent product analytics case study identifying why Duolingo's streak mechanic is plateauing and proposing a motivation-based personalization solution.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,600;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #F7F5F0;
+    --surface: #FFFFFF;
+    --ink: #1A1A18;
+    --ink-muted: #6B6860;
+    --ink-faint: #A8A69F;
+    --accent: #1D6B4A;
+    --accent-light: #E8F4EE;
+    --border: #E2DFD8;
+    --serif: 'Fraunces', Georgia, serif;
+    --sans: 'DM Sans', system-ui, sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 17px;
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* NAV */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(247,245,240,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .nav-brand { font-family: var(--serif); font-size: 15px; font-weight: 400; color: var(--ink); text-decoration: none; letter-spacing: 0.01em; }
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
+  .nav-links a { font-size: 13px; font-weight: 500; color: var(--ink-muted); text-decoration: none; letter-spacing: 0.03em; transition: color 0.2s; cursor: pointer; }
+  .nav-links a:hover { color: var(--accent); }
+
+  /* HERO */
+  .hero {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 6rem 2rem 4rem;
+    animation: fadeUp 0.7s ease both;
+  }
+  .hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-light);
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 1.5rem;
+  }
+  .hero h1 {
+    font-family: var(--serif);
+    font-size: clamp(2.2rem, 5vw, 3.4rem);
+    font-weight: 300;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin-bottom: 1rem;
+  }
+  .hero h1 em { font-style: italic; color: var(--accent); }
+  .hero-sub {
+    font-size: 1.1rem;
+    color: var(--ink-muted);
+    font-weight: 300;
+    max-width: 540px;
+    margin-bottom: 2.5rem;
+  }
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    font-size: 13px;
+    color: var(--ink-faint);
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+  }
+  .hero-meta span { display: flex; align-items: center; gap: 6px; }
+
+  /* STATS BAR */
+  .stats-bar {
+    max-width: 760px;
+    margin: 0 auto 3rem;
+    padding: 0 2rem;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    animation: fadeUp 0.7s 0.15s ease both;
+  }
+  .stat {
+    background: var(--surface);
+    padding: 1.25rem 1.5rem;
+    text-align: center;
+  }
+  .stat-num {
+    font-family: var(--serif);
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .stat-label { font-size: 12px; color: var(--ink-faint); font-weight: 400; }
+
+  /* MAIN CONTENT */
+  .content {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 2rem 6rem;
+  }
+
+  /* SECTIONS */
+  .section {
+    margin-bottom: 4rem;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+  }
+
+  .section h2 {
+    font-family: var(--serif);
+    font-size: 1.85rem;
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin-bottom: 1.25rem;
+    line-height: 1.2;
+  }
+
+  .section h3 {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--ink);
+    margin: 2rem 0 0.75rem;
+    letter-spacing: 0.01em;
+  }
+
+  .section p {
+    color: var(--ink-muted);
+    margin-bottom: 1.1rem;
+    font-weight: 300;
+  }
+
+  .section p strong { color: var(--ink); font-weight: 500; }
+
+  /* CALLOUT */
+  .callout {
+    background: var(--accent-light);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    padding: 1.25rem 1.5rem;
+    margin: 1.5rem 0;
+    font-size: 1.05rem;
+    color: var(--accent);
+    font-style: italic;
+    font-family: var(--serif);
+    font-weight: 300;
+  }
+
+  /* SYMPTOM ROOT CAUSE */
+  .diagnosis {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 1.5rem 0;
+  }
+  .diagnosis-cell {
+    background: var(--surface);
+    padding: 1.25rem 1.5rem;
+  }
+  .diagnosis-cell .label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+    color: var(--ink-faint);
+  }
+  .diagnosis-cell .value {
+    font-size: 0.95rem;
+    color: var(--ink);
+    font-weight: 400;
+    line-height: 1.5;
+  }
+  .diagnosis-cell.symptom .label { color: #B45309; }
+  .diagnosis-cell.rootcause .label { color: var(--accent); }
+
+  /* OPTIONS */
+  .options { display: flex; flex-direction: column; gap: 1rem; margin: 1.5rem 0; }
+  .option {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    transition: border-color 0.2s;
+  }
+  .option.recommended {
+    border-color: var(--accent);
+    background: var(--accent-light);
+  }
+  .option-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 4px;
+  }
+  .option.recommended .option-label { color: var(--accent); }
+  .option-title { font-weight: 500; color: var(--ink); margin-bottom: 4px; font-size: 0.95rem; }
+  .option-desc { font-size: 0.9rem; color: var(--ink-muted); font-weight: 300; line-height: 1.6; }
+
+  /* METRICS */
+  .metrics { display: flex; flex-direction: column; gap: 1rem; margin: 1.5rem 0; }
+  .metric-row {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.5rem;
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 1rem;
+    align-items: start;
+  }
+  .metric-type {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    padding-top: 2px;
+  }
+  .metric-type.primary { color: var(--accent); }
+  .metric-type.guardrail { color: #B45309; }
+  .metric-value { font-size: 0.9rem; color: var(--ink-muted); line-height: 1.6; font-weight: 300; }
+
+  /* PHASES */
+  .phases { display: flex; flex-direction: column; gap: 0; margin: 1.5rem 0; }
+  .phase {
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    gap: 1rem;
+    padding-bottom: 1.5rem;
+    position: relative;
+  }
+  .phase:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    left: 21px;
+    top: 44px;
+    bottom: 0;
+    width: 2px;
+    background: var(--border);
+  }
+  .phase-num {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--serif);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--accent);
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+  }
+  .phase-body { padding-top: 10px; }
+  .phase-title { font-weight: 500; color: var(--ink); margin-bottom: 4px; font-size: 0.95rem; }
+  .phase-desc { font-size: 0.9rem; color: var(--ink-muted); font-weight: 300; line-height: 1.6; }
+  .phase-meta { font-size: 12px; color: var(--ink-faint); margin-top: 6px; }
+
+  /* LEARNINGS */
+  .learnings { display: flex; flex-direction: column; gap: 1rem; margin: 1.5rem 0; }
+  .learning {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  .learning-num {
+    font-family: var(--serif);
+    font-size: 1.5rem;
+    font-weight: 300;
+    color: var(--border);
+    line-height: 1;
+    flex-shrink: 0;
+    width: 32px;
+  }
+  .learning-text { font-size: 0.95rem; color: var(--ink-muted); font-weight: 300; line-height: 1.7; padding-top: 4px; }
+  .learning-text strong { color: var(--ink); font-weight: 500; display: block; margin-bottom: 2px; }
+
+  /* REFERENCES */
+  .references {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-top: 1.5rem;
+  }
+  .references ol { padding-left: 1.25rem; }
+  .references li {
+    font-size: 0.82rem;
+    color: var(--ink-faint);
+    margin-bottom: 0.6rem;
+    line-height: 1.6;
+  }
+  .references li a { color: var(--accent); text-decoration: none; }
+  .references li a:hover { text-decoration: underline; }
+
+  /* DIVIDER */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 3rem 0;
+  }
+
+  /* BACK LINK */
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-muted);
+    text-decoration: none;
+    transition: color 0.2s;
+    margin-bottom: 2rem;
+  }
+  .back-link:hover { color: var(--accent); }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 2rem;
+    text-align: center;
+    font-size: 13px;
+    color: var(--ink-faint);
+  }
+  footer a { color: var(--accent); text-decoration: none; }
+
+  /* ANIMATION */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 600px) {
+    .stats-bar { grid-template-columns: 1fr; }
+    .diagnosis { grid-template-columns: 1fr; }
+    .metric-row { grid-template-columns: 1fr; gap: 4px; }
+    nav { padding: 0 1rem; }
+    .hero, .content { padding-left: 1.25rem; padding-right: 1.25rem; }
+    .stats-bar { margin-left: 1.25rem; margin-right: 1.25rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="https://github.com/Prasanna1377" class="nav-brand">Prasanna Pingale</a>
+  <ul class="nav-links">
+    <li><a href="#analysis">Analysis</a></li>
+    <li><a href="#solution">Solution</a></li>
+    <li><a href="#metrics">Metrics</a></li>
+    <li><a href="https://github.com/Prasanna1377/duolingo-case-study" target="_blank" rel="noopener">GitHub</a></li>
+  </ul>
+</nav>
+
+<div class="hero">
+  <div class="hero-tag">Product Analytics Case Study</div>
+  <h1>Duolingo: <em>Beyond</em><br>the Streak</h1>
+  <p class="hero-sub">What happens when your best retention mechanic stops moving the needle?</p>
+  <div class="hero-meta">
+    <span>Prasanna Pingale</span>
+    <span>March 2026</span>
+    <span>Independent analysis</span>
+    <span>Behavioral frameworks + A/B test design</span>
+  </div>
+</div>
+
+<div class="stats-bar">
+  <div class="stat">
+    <div class="stat-num">135M</div>
+    <div class="stat-label">Monthly active users</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">4.5x</div>
+    <div class="stat-label">DAU growth over 4 years</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">600+</div>
+    <div class="stat-label">Streak experiments run</div>
+  </div>
+</div>
+
+<div class="content">
+
+  <a href="https://github.com/Prasanna1377" class="back-link">&#8592; Back to portfolio</a>
+
+  <div class="section">
+    <div class="section-label">About this work</div>
+    <h2>What I did</h2>
+    <p>This is an independent analysis conducted as part of my product analyst portfolio. All data is sourced from Duolingo's publicly available shareholder letters, product blog, and published research. It was not commissioned by Duolingo and does not reflect any internal information.</p>
+    <p>My role was to identify a retention problem from public signals, diagnose the root cause using behavioral frameworks, evaluate alternative solutions, and propose a measurable recommendation — the same workflow I apply as a product analyst embedded in a product team.</p>
+    <p><strong>Tools and methods:</strong> Self-Determination Theory, Fogg Behavior Model, Goal-Setting Theory, Prospect Theory, secondary research synthesis, A/B test design, metric definition, and product recommendation writing.</p>
+  </div>
+
+  <hr class="divider">
+
+  <div class="section" id="analysis">
+    <div class="section-label">The Challenge</div>
+    <h2>The best alarm clock in the world</h2>
+    <p>Duolingo is the world's most downloaded language learning app with $1 billion in annual revenue. For years it grew by solving one problem better than anyone else: getting users to come back every single day.</p>
+    <p>Its streak feature became one of the most studied retention mechanics in consumer tech. The team ran over 600 experiments on it. Daily active users grew 4.5 times in four years by optimising a single metric — Current User Retention Rate (CURR), which measures how many active users return the next day.</p>
+    <p>But by 2025, growth was decelerating. CURR was approaching a natural ceiling. Duolingo's own data team acknowledged that 90% of daily active users had collapsed into a single behavioral state, making the metric too blunt to move further.</p>
+
+    <div class="callout">Duolingo had built the world's best alarm clock. Now it needed to give people a better reason to get out of bed.</div>
+
+    <div class="diagnosis">
+      <div class="diagnosis-cell symptom">
+        <div class="label">Symptom</div>
+        <div class="value">Daily active user growth decelerating from 65% to 36% year over year</div>
+      </div>
+      <div class="diagnosis-cell rootcause">
+        <div class="label">Root cause</div>
+        <div class="value">A single extrinsic retention mechanic applied uniformly to users with fundamentally different motivations</div>
+      </div>
+    </div>
+
+    <h3>Why the streak has limits</h3>
+    <p>The streak works through loss aversion, a principle from prospect theory (Kahneman &amp; Tversky, 1979). Once a user builds a 30-day streak, breaking it feels disproportionately costly. This is why it works so well short term.</p>
+    <p>The problem is that loss aversion is extrinsic. It motivates people to protect something they have, not to pursue something they want. Self-Determination Theory (Deci &amp; Ryan, 1985) shows that extrinsic motivation can crowd out intrinsic motivation over time. A user who opens Duolingo solely to protect a streak is one streak break away from churning permanently.</p>
+
+    <h3>The motivation gap</h3>
+    <p>A Duolingo survey of over 15 million US users identified five primary learning motivations: school (22%), brain training, travel (~11%), work (~11%), and family connections (~11%). These motivations respond to completely different product experiences.</p>
+    <p>A student learning Spanish for an exam wants proficiency benchmarks. A professional learning Mandarin for business travel wants conversational readiness. A grandparent learning Portuguese to speak with family wants emotional progress — not a daily attendance counter.</p>
+    <p>The Fogg Behavior Model (Fogg, 2009) holds that behavior requires motivation, ability, and a prompt. The streak provides a powerful prompt and sufficient ability, but does nothing to address motivation for users whose personal goal is not aligned with showing up every day.</p>
+    <p>A user with a 200-day streak who cannot order coffee in French has high engagement and low outcome attainment. That user is a churn risk the moment the streak breaks. The streak tells users they showed up. It does not tell them they are getting closer to what they came for.</p>
+  </div>
+
+  <hr class="divider">
+
+  <div class="section" id="solution">
+    <div class="section-label">The Solution</div>
+    <h2>Learner Identity</h2>
+    <p>I evaluated three options before landing on a recommendation.</p>
+
+    <div class="options">
+      <div class="option">
+        <div class="option-label">Option A</div>
+        <div class="option-title">Deepen the streak mechanic further</div>
+        <div class="option-desc">Add milestone rewards, social visibility, and protection mechanics. Low risk but diminishing returns are already documented. Addresses the symptom, not the root cause.</div>
+      </div>
+      <div class="option">
+        <div class="option-label">Option B</div>
+        <div class="option-title">Build a full adaptive learning system</div>
+        <div class="option-desc">Use machine learning to infer motivation from behavior automatically. Powerful in theory but noisy for new users, and 18 to 24 months from meaningful impact.</div>
+      </div>
+      <div class="option recommended">
+        <div class="option-label">Option C — Recommended</div>
+        <div class="option-title">Learner Identity</div>
+        <div class="option-desc">Capture motivation with a single question at a natural checkpoint, then personalize the retention experience. Directly addresses the root cause, executable within existing infrastructure, testable within one quarter.</div>
+      </div>
+    </div>
+
+    <h3>How it works</h3>
+    <p>At the Day 7 streak milestone, Duolingo asks users one question: what does success look like for you? Five choices: pass a test or reach a certification, hold a real conversation, connect with family or a partner, stay mentally sharp, travel.</p>
+    <p>That response drives three downstream changes:</p>
+    <p><strong>Progress indicator</strong> shifts from a streak counter to a goal-relevant metric. Exam-focused users see a CEFR level tracker. Conversation-oriented users see conversations completed. Connection-oriented users see a personalized milestone tied to their language and context.</p>
+    <p><strong>Push notifications</strong> reference the stated goal instead of streak protection. "You are three levels from B1 Spanish" is more motivating for an exam learner than "Don't break your streak."</p>
+    <p><strong>Feature recommendations</strong> surface content aligned with the motivation. Conversation-oriented users see an AI roleplay preview with a paid tier prompt. Exam-oriented users see practice tests and certification content.</p>
+    <p>Casual brain-trainers receive no changes. Streaks, leaderboards, XP, and gamification stay exactly as they are.</p>
+  </div>
+
+  <hr class="divider">
+
+  <div class="section" id="metrics">
+    <div class="section-label">Measurement</div>
+    <h2>How I would test it</h2>
+
+    <div class="metrics">
+      <div class="metric-row">
+        <div class="metric-type primary">Primary</div>
+        <div class="metric-value">30-day retention rate by motivation segment, targeting a 5 to 8 percentage point lift for goal-oriented, conversation-oriented, and connection-oriented segments relative to control</div>
+      </div>
+      <div class="metric-row">
+        <div class="metric-type">Secondary</div>
+        <div class="metric-value">Free-to-paid conversion rate for goal-oriented and conversation-oriented users. Time to 7-day streak for new users.</div>
+      </div>
+      <div class="metric-row">
+        <div class="metric-type guardrail">Guardrail</div>
+        <div class="metric-value">Overall CURR and average session length. Any degradation triggers an immediate hold on rollout.</div>
+      </div>
+      <div class="metric-row">
+        <div class="metric-type">Test design</div>
+        <div class="metric-value">Holdout experiment with four arms (control plus one per non-casual segment), new users in week one, 90 days minimum, pre-registered action plans for win and loss outcomes.</div>
+      </div>
+    </div>
+
+    <h3>Implementation phases</h3>
+    <div class="phases">
+      <div class="phase">
+        <div class="phase-num">1</div>
+        <div class="phase-body">
+          <div class="phase-title">Validate the assumption</div>
+          <div class="phase-desc">Conduct 30 qualitative user interviews. Pull warehouse data to test whether motivation at signup predicts 30-day retention. Validate before building anything.</div>
+          <div class="phase-meta">Owner: Product analyst and user research &nbsp;|&nbsp; Timeline: 6 weeks</div>
+        </div>
+      </div>
+      <div class="phase">
+        <div class="phase-num">2</div>
+        <div class="phase-body">
+          <div class="phase-title">Build</div>
+          <div class="phase-desc">Design the Day 7 motivation prompt. Build three progress indicator variants. Update notification copy logic. Instrument with event-level logging.</div>
+          <div class="phase-meta">Owner: Product manager, engineering lead, design lead &nbsp;|&nbsp; Timeline: 10 weeks</div>
+        </div>
+      </div>
+      <div class="phase">
+        <div class="phase-num">3</div>
+        <div class="phase-body">
+          <div class="phase-title">Test</div>
+          <div class="phase-desc">Run the holdout experiment. Report nightly on guardrail metrics. Pre-register action plans before launch.</div>
+          <div class="phase-meta">Owner: Product analyst, data engineering &nbsp;|&nbsp; Timeline: 12 weeks</div>
+        </div>
+      </div>
+      <div class="phase">
+        <div class="phase-num">4</div>
+        <div class="phase-body">
+          <div class="phase-title">Roll out</div>
+          <div class="phase-desc">If primary metric moves 5 or more percentage points for at least two segments with no guardrail degradation, roll out to 100% of new users.</div>
+          <div class="phase-meta">Owner: Product manager</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="section">
+    <div class="section-label">What I Learned</div>
+    <h2>Three takeaways</h2>
+    <div class="learnings">
+      <div class="learning">
+        <div class="learning-num">01</div>
+        <div class="learning-text"><strong>The most important metric is not always the most visible one.</strong> CURR was the right metric for four years and then became a ceiling. Knowing when a metric has done its job is as important as knowing how to move it.</div>
+      </div>
+      <div class="learning">
+        <div class="learning-num">02</div>
+        <div class="learning-text"><strong>Behavioral theory is a shortcut to better product hypotheses.</strong> Connecting the streak to prospect theory and loss aversion helped explain not just what was happening but why, and pointed directly toward the fix. Frameworks are not academic decoration. They are diagnostic tools.</div>
+      </div>
+      <div class="learning">
+        <div class="learning-num">03</div>
+        <div class="learning-text"><strong>The gap between engagement and outcome is where most products lose users.</strong> A streak measures attendance. It does not measure progress. Any product that cannot answer "did this user get what they came for?" is building on a fragile foundation.</div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="section">
+    <div class="section-label">References</div>
+    <h2>Sources</h2>
+    <div class="references">
+      <ol>
+        <li>Bulaev, S. (2025). <em>Duolingo's AI-first shift: Growth, jobs, and the future of learning.</em> Bulaev. <a href="https://www.bulaev.net/p/duolingos-ai-first-shift-growth-jobs" target="_blank">bulaev.net</a></li>
+        <li>Deci, E. L., Koestner, R., &amp; Ryan, R. M. (1999). A meta-analytic review of experiments examining the effects of extrinsic rewards on intrinsic motivation. <em>Psychological Bulletin, 125</em>(6), 627–668. <a href="https://doi.org/10.1037/0033-2909.125.6.627" target="_blank">doi.org</a></li>
+        <li>Deci, E. L., &amp; Ryan, R. M. (1985). <em>Intrinsic motivation and self-determination in human behavior.</em> Plenum Press.</li>
+        <li>Duolingo. (2023). <em>Special report: Understanding English learners around the world.</em> <a href="https://blog.duolingo.com/english-learner-motivations" target="_blank">blog.duolingo.com</a></li>
+        <li>Duolingo. (2024). <em>Q4/FY 2024 shareholder letter.</em> <a href="https://investors.duolingo.com/static-files/99006c40-d8cf-41ca-b5b1-c5cb1fa5ba88" target="_blank">investors.duolingo.com</a></li>
+        <li>Duolingo. (2025a). <em>Q3 2025 shareholder letter.</em> <a href="https://investors.duolingo.com/static-files/c9bf5861-b19d-4396-b060-c0dbeefd34f5" target="_blank">investors.duolingo.com</a></li>
+        <li>Duolingo. (2025b). <em>Q4 and full year 2025 earnings release.</em> <a href="https://investors.duolingo.com/news-releases/news-release-details/duolingo-reports-fourth-quarter-and-full-year-2025-results" target="_blank">investors.duolingo.com</a></li>
+        <li>Duolingo. (2025c). <em>The Duolingo streak uses habit research to keep you motivated.</em> <a href="https://blog.duolingo.com/how-duolingo-streak-builds-habit" target="_blank">blog.duolingo.com</a></li>
+        <li>First Round Review. (n.d.). <em>The tenets of A/B testing from Duolingo's master growth hacker.</em> <a href="https://review.firstround.com/the-tenets-of-a-b-testing-from-duolingos-master-growth-hacker" target="_blank">review.firstround.com</a></li>
+        <li>Fogg, B. J. (2009). A behavior model for persuasive design. <em>Proceedings of the 4th International Conference on Persuasive Technology</em> (Article 40). ACM. <a href="https://doi.org/10.1145/1541948.1541999" target="_blank">doi.org</a></li>
+        <li>Gustafson, E. (2023). <em>Meaningful metrics: How data sharpened the focus of product teams.</em> Duolingo. <a href="https://blog.duolingo.com/growth-model-duolingo" target="_blank">blog.duolingo.com</a></li>
+        <li>Kahneman, D., &amp; Tversky, A. (1979). Prospect theory: An analysis of decision under risk. <em>Econometrica, 47</em>(2), 263–291. <a href="https://doi.org/10.2307/1914185" target="_blank">doi.org</a></li>
+        <li>Locke, E. A., &amp; Latham, G. P. (1990). <em>A theory of goal setting and task performance.</em> Prentice-Hall.</li>
+        <li>Mazal, J. (2023). <em>How Duolingo reignited user growth.</em> Lenny's Newsletter. <a href="https://www.lennysnewsletter.com/p/how-duolingo-reignited-user-growth" target="_blank">lennysnewsletter.com</a></li>
+        <li>Shuttleworth, J. (2024). <em>Behind the product: Duolingo streaks.</em> Lenny's Newsletter. <a href="https://www.lennysnewsletter.com/p/behind-the-product-duolingo-streaks" target="_blank">lennysnewsletter.com</a></li>
+      </ol>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <p>Prasanna Pingale &nbsp;·&nbsp; Product Analyst &nbsp;·&nbsp; <a href="https://github.com/Prasanna1377" target="_blank">GitHub</a> &nbsp;·&nbsp; <a href="https://linkedin.com/in/prasannapingale" target="_blank">LinkedIn</a></p>
+</footer>
+
+<script>
+  document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
+    anchor.addEventListener('click', function(e) {
+      e.preventDefault();
+      var target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+</script>
+</body>
+</html>
